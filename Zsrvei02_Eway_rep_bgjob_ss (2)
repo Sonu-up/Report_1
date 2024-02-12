@@ -1,0 +1,40 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEFL_EWAY_REP_BGJOB_SS
+*&---------------------------------------------------------------------*
+
+*&--- Selection Screen
+ SELECTION-SCREEN : BEGIN OF BLOCK b1 WITH FRAME TITLE text-t01.
+
+ PARAMETERS : p_bg RADIOBUTTON GROUP rb1 USER-COMMAND bg DEFAULT 'X',            "Background Process
+              p_fg RADIOBUTTON GROUP rb1.                                        "Foreground Process
+
+ SELECTION-SCREEN SKIP.
+ SELECT-OPTIONS : s_date FOR sy-datum DEFAULT sy-datum OBLIGATORY,
+                  s_head  FOR gs_log-headno_ext MODIF ID c1.
+
+ SELECT-OPTIONS : s_pst FOR zein_inv_data-irn_proc NO INTERVALS.
+ PARAMETERS  :p_inc TYPE char1 AS CHECKBOX .
+
+ PARAMETERS : p_irn TYPE char1 NO-DISPLAY.
+ PARAMETERS : p_check TYPE char1 AS CHECKBOX . "Add For Overcome Error:- No business request key exists
+ PARAMETERS : p_form TYPE char1 AS CHECKBOX .
+ SELECTION-SCREEN : END OF BLOCK b1.
+
+ SELECTION-SCREEN : BEGIN OF BLOCK b2  WITH FRAME TITLE text-t02.
+ PARAMETERS  :p_reg TYPE char1 AS CHECKBOX .
+ SELECTION-SCREEN : END OF BLOCK b2.
+
+* AT SELECTION-SCREEN OUTPUT.
+*   LOOP AT SCREEN.
+*     CASE screen-group1.
+*       WHEN 'C1'.
+*         IF p_bg IS INITIAL.
+*           screen-active = 1.
+*         ELSE.
+*           screen-active = 0.
+*         ENDIF.
+*         MODIFY SCREEN.
+*       WHEN OTHERS.
+*     ENDCASE.
+*   ENDLOOP.
+

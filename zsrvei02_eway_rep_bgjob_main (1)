@@ -1,0 +1,90 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEFL_EWAY_REP_BGJOB_MAIN
+*&---------------------------------------------------------------------*
+
+START-OF-SELECTION.
+
+  PERFORM get_data.           "To get data
+
+  IF gt_log IS NOT INITIAL.
+
+    IF sy-tcode EQ 'ZEINV_NUM_GEN'.
+      DATA : i_date TYPE sy-datum,
+             e_first_day TYPE  sy-datum,
+             e_last_day TYPE  sy-datum,
+             i_range   TYPE STANDARD TABLE OF rsintrange."Table Parameter For First Day Of Month.
+
+      i_date = s_date-low."wa_vbrk_vbrp-fkdat.
+**********************************************************************
+      " Comment For FM is not Exsist
+**********************************************************************
+*    CALL FUNCTION 'OIL_MONTH_GET_FIRST_LAST'
+*     EXPORTING
+**       I_MONTH           =
+**       I_YEAR            =
+*       i_date            = i_date
+*     IMPORTING
+*       E_FIRST_DAY       = E_FIRST_DAY
+*       E_LAST_DAY        = E_LAST_DAY
+*     EXCEPTIONS
+*       WRONG_DATE        = 1
+*       OTHERS            = 2
+*              .
+**********************************************************************
+      CALL FUNCTION 'RS_VARI_V_1_ACTUAL_MONTH' "For Fist Date of Month
+       EXPORTING
+         systime          = i_date
+       IMPORTING
+         p_date           = e_first_day
+      TABLES
+         p_intrange       = i_range
+                .
+      CALL FUNCTION 'SLS_MISC_GET_LAST_DAY_OF_MONTH' "For Last Date of Month
+        EXPORTING
+          day_in            = i_date
+        IMPORTING
+          last_day_of_month = e_last_day
+        EXCEPTIONS
+          day_in_not_valid  = 1
+          OTHERS            = 2.
+      IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+      ENDIF.
+**********************************************************************
+      IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+      ENDIF.
+
+      IF s_date-low BETWEEN e_first_day AND e_last_day.
+      ELSE.
+        MESSAGE 'We can generate IRN only for current month invoices' TYPE 'I'.
+        LEAVE LIST-PROCESSING.
+      ENDIF.
+
+    ENDIF.
+
+    IF p_fg IS NOT INITIAL.                         " Forground Processing
+      PERFORM fill_final.                                     "Prepare final
+
+      PERFORM prepare_fieldcatalog.                           "Prepare Fieldcatalog
+
+      PERFORM display_output.                                 "Display output
+    ELSE.
+      PERFORM fill_final.                                     "Prepare final
+
+      PERFORM validate_irn.                                   "To validate IRN values
+
+      PERFORM irn_generate.                                    "Genereate IRN
+
+      PERFORM prepare_fieldcatalog.                           "Prepare Fieldcatalog
+
+      PERFORM display_output.                                 "Display output
+    ENDIF.
+
+*    PERFORM create_file.        "Create file in Appliction server,
+  ELSE.
+    MESSAGE 'No data to be processed for given input' TYPE 'E'.
+  ENDIF.
+
