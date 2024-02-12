@@ -1,0 +1,443 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEFL_EWAY_REP_BGJOB_TOP
+*&---------------------------------------------------------------------*
+
+
+TABLES : zein_inv_data .
+*&--- Constants Declarations
+CONSTANTS : c_inv_type  TYPE rvari_vnam VALUE 'ZDIGI_INV_TYPE',
+            c_sales_off TYPE rvari_vnam VALUE 'ZINV_SALESOFFICE'.
+
+*&--- Type Declarations
+
+TYPES : BEGIN OF ty_but000,
+        partner      TYPE bu_partner,
+        partner_guid TYPE bu_partner_guid,
+       END OF ty_but000.
+
+TYPES : BEGIN OF ty_but020,
+        partner TYPE bu_partner,
+        addrnumber TYPE ad_addrnum,
+       END OF ty_but020.
+
+TYPES : BEGIN OF ty_adr2,
+         addrnumber TYPE adr2-addrnumber,
+         persnumber TYPE adr2-persnumber,
+         date_from TYPE adr2-date_from,
+         consnumber TYPE adr2-consnumber,
+         tel_number TYPE adr2-tel_number,
+         r3_user    TYPE adr2-r3_user,
+        END OF ty_adr2.
+
+TYPES : BEGIN OF ty_adr6,
+         addrnumber  TYPE adr6-addrnumber,
+         persnumber  TYPE adr6-persnumber,
+         date_from   TYPE adr6-date_from,
+         consnumber  TYPE adr6-consnumber,
+         flgdefault  TYPE adr6-flgdefault,
+         home_flag   TYPE adr6-home_flag,
+         smtp_addr   TYPE adr6-smtp_addr,
+      END OF ty_adr6.
+
+TYPES : BEGIN OF ty_inv_head,
+         billing_no TYPE bea_headno_ext,
+         object_id  TYPE crmt_object_id_db,
+        END OF ty_inv_head.
+
+TYPES : BEGIN OF ty_crmb_bdh,
+          bdh_guid TYPE bea_bdh_guid,
+          headno_ext TYPE bea_headno_ext,
+        END OF ty_crmb_bdh.
+
+TYPES : BEGIN OF ty_bill,
+          reference_no TYPE bea_headno_ext,
+        END OF ty_bill.
+
+TYPES : BEGIN OF ty_data_org,
+         partner      TYPE bu_partner,
+         sales_office TYPE hrp1000-objid,
+         sales_group  TYPE crmt_sales_group,
+         district     TYPE crmt_district,
+        END OF ty_data_org.
+
+
+TYPES : BEGIN OF ty_hrp1000,
+          otype TYPE hrp1000-otype,
+          objid TYPE hrp1000-objid,
+          short TYPE hrp1000-short,
+        END OF ty_hrp1000.
+
+TYPES : BEGIN OF ty_final,
+          check_box           TYPE xfeld,
+*           src_headno          TYPE zein_inv_data-src_headno,
+          be_head_no          TYPE zein_inv_data-be_head_no,
+          headno_ext          TYPE zein_inv_data-headno_ext,
+          partner             TYPE zein_inv_data-partner,
+          bill_org            TYPE zein_inv_data-bill_org,
+          bill_type           TYPE zein_inv_data-bill_type,
+          cancel_flag         TYPE zein_inv_data-cancel_flag,
+          reference_no        TYPE zein_inv_data-reference_no,
+          ac_doc_no           TYPE zein_inv_data-ac_doc_no,
+          ref_doc_no          TYPE zein_inv_data-ref_doc_no,
+          inv_doc_no          TYPE zein_inv_data-inv_doc_no,
+          create_on           TYPE zein_inv_data-create_on,
+          create_time         TYPE zein_inv_data-create_time,
+          pstng_date          TYPE zein_inv_data-pstng_date,
+          doc_currency        TYPE zein_inv_data-doc_currency,
+          net_value           TYPE zein_inv_data-net_value,
+          tax_value           TYPE zein_inv_data-tax_value,
+          irn_proc            TYPE zein_inv_data-irn_proc,
+          qty                 TYPE zein_str_itemlist-qty,
+          freeqty             TYPE zein_str_itemlist-freeqty,
+          unitprice           TYPE zein_str_itemlist-unitprice,
+          totamt              TYPE zein_str_itemlist-totamt,
+          discount            TYPE zein_str_itemlist-discount,
+          pretaxval           TYPE zein_str_itemlist-pretaxval,
+          assamt              TYPE zein_str_itemlist-assamt,
+          gstrt               TYPE zein_str_itemlist-gstrt,
+          igstamt             TYPE zein_str_itemlist-igstamt,
+          cgstamt             TYPE zein_str_itemlist-cgstamt,
+          sgstamt             TYPE zein_str_itemlist-sgstamt,
+          cesrt               TYPE zein_str_itemlist-cesrt,
+          cesamt              TYPE zein_str_itemlist-cesamt,
+          cesnonadvlamt       TYPE zein_str_itemlist-cesnonadvlamt,
+          statecesrt          TYPE zein_str_itemlist-statecesrt,
+          statecesamt         TYPE zein_str_itemlist-statecesamt,
+          statecesnonadvlamt  TYPE zein_str_itemlist-statecesnonadvlamt,
+          othchrg             TYPE zein_str_itemlist-othchrg,
+          totitemval          TYPE zein_str_itemlist-totitemval,
+          version             TYPE string ,
+          suptyp              TYPE string ,
+          doctype             TYPE string ,
+          part_gstin          TYPE bapibus1006tax-taxnumber  ,
+          bill_status         TYPE char1 ,
+          status              TYPE char20,
+          message             TYPE char100,
+          irn                 TYPE char100,
+          bdh_guid            TYPE bea_bdh_guid ,
+          incoterms1       TYPE crmt_incoterms1 ,
+          incoterms2       TYPE crmt_incoterms2 ,
+          org_docdt        TYPE bea_bill_date ,
+          pricing_error TYPE bea_pricing_error ,
+          official_docno TYPE itl_official_docno ,
+          supp_gstin TYPE bapibus1006tax-taxnumber  ,
+        END OF ty_final.
+
+TYPES : BEGIN OF ty_item,
+            qty                TYPE zein_str_itemlist-qty,
+           freeqty             TYPE zein_str_itemlist-freeqty,
+           unitprice           TYPE zein_str_itemlist-unitprice,
+           totamt              TYPE zein_str_itemlist-totamt,
+           discount            TYPE zein_str_itemlist-discount,
+           pretaxval           TYPE zein_str_itemlist-pretaxval,
+           assamt              TYPE zein_str_itemlist-assamt,
+           gstrt               TYPE zein_str_itemlist-gstrt,
+           igstamt             TYPE zein_str_itemlist-igstamt,
+           cgstamt             TYPE zein_str_itemlist-cgstamt,
+           sgstamt             TYPE zein_str_itemlist-sgstamt,
+           cesrt               TYPE zein_str_itemlist-cesrt,
+           cesamt              TYPE zein_str_itemlist-cesamt,
+           cesnonadvlamt       TYPE zein_str_itemlist-cesnonadvlamt,
+           statecesrt          TYPE zein_str_itemlist-statecesrt,
+           statecesamt         TYPE zein_str_itemlist-statecesamt,
+            statecesnonadvlamt TYPE zein_str_itemlist-statecesnonadvlamt,
+            othchrg            TYPE zein_str_itemlist-othchrg,
+          totitemval           TYPE zein_str_itemlist-totitemval,
+        END OF ty_item.
+
+TYPES : BEGIN OF ty_ein_inv,
+           vbeln TYPE zein_inv-vbeln,
+           ackno TYPE zein_inv-ackno,
+           ackdt TYPE zein_inv-ackdt,
+           zzirn TYPE zein_inv-zzirn,
+         message TYPE zein_inv-message,
+        END OF ty_ein_inv.
+
+TYPES: ty_app_ser TYPE char4000.
+
+*&--- Internal Tables
+DATA : gt_log      TYPE STANDARD TABLE OF zein_inv_data ,
+       gt_but020   TYPE STANDARD TABLE OF ty_but020,
+       gt_but000   TYPE STANDARD TABLE OF ty_but000,
+       gt_adr2     TYPE STANDARD TABLE OF ty_adr2,
+       gt_adr6     TYPE STANDARD TABLE OF ty_adr6,
+       gt_inv_head TYPE STANDARD TABLE OF ty_inv_head,
+       gt_crmb_bdh TYPE STANDARD TABLE OF ty_crmb_bdh,
+       gt_crmb_bdh_all TYPE STANDARD TABLE OF /1bea/crmb_bdh ,
+       gt_bil_req TYPE STANDARD TABLE OF  zein_bil_req ,
+
+       gt_bill     TYPE STANDARD TABLE OF ty_bill,
+       gt_tvarvc   TYPE STANDARD TABLE OF tvarvc,
+       gt_hrp1000  TYPE STANDARD TABLE OF ty_hrp1000,
+       gt_return   TYPE STANDARD TABLE OF bapiret2,                "Return
+       gt_data_org TYPE STANDARD TABLE OF ty_data_org,             "Data
+       gt_sales_area_bp TYPE crmt_bsp_sales_area_bp_t,             "Business Partner Sales Area Data.
+       gt_otf2          TYPE tsfotf,                               "To hold OTF data
+       gt_otf           TYPE otf_t_itcoo,
+       gt_otf_pdf       TYPE tsfotf,                               "To hold OTF data
+       gt_tline         TYPE STANDARD TABLE OF tline,
+       gt_app_svr       TYPE  TABLE OF ty_app_ser,
+       gt_pdf_content   TYPE  solix_tab,
+       gt_fcat          TYPE slis_t_fieldcat_alv,
+       gt_digital_inv_rep TYPE STANDARD TABLE OF zdigital_inv_rep,
+       gt_final           TYPE STANDARD TABLE OF ty_final,
+       gt_item            TYPE STANDARD TABLE OF ty_item,
+       gt_item_ei         TYPE STANDARD TABLE OF zeiinv_item_data,
+       gt_itemlist        TYPE STANDARD TABLE OF zein_s_item,
+       gt_ein_inv         TYPE STANDARD TABLE OF ty_ein_inv.
+
+*&--- WorkArea
+DATA : gs_log             LIKE LINE OF gt_log ,
+       gs_tab_log         LIKE LINE OF gt_log ,
+       gs_but020          TYPE ty_but020,
+       gs_but000          TYPE ty_but000,
+       gs_adr2            TYPE ty_adr2,
+       gs_adr6            TYPE ty_adr6,
+       gs_inv_head        TYPE ty_inv_head,
+       gs_crmb_bdh        TYPE ty_crmb_bdh,
+       gs_bill            TYPE ty_bill,
+       gs_tvarvc          TYPE tvarvc,
+       gs_hrp1000         TYPE ty_hrp1000,
+       gs_sales_area      TYPE bapibus1006_sales_area,           "Sales Area
+       gs_sales_area_bp   TYPE crmt_bsp_sales_area_bp,           "Business Partner Sales Area.
+       gs_data_org        TYPE ty_data_org,                      "Data
+       gs_ctrlop          TYPE ssfctrlop,       "Control Parameters for the Smartform
+       gs_job_output_info TYPE ssfcrescl,       "Will contain the Smartform OTF data
+       gs_composer_param  TYPE ssfcompop,
+       gs_app_svr         TYPE ty_app_ser,
+       gs_pdf             TYPE solix,
+       gs_digital_inv_rep TYPE zdigital_inv_rep,
+       gs_fcat            TYPE slis_fieldcat_alv,
+       gs_layout          TYPE slis_layout_alv,
+       gs_final           TYPE ty_final,
+       gs_item            TYPE ty_item,
+       gs_item_ei         TYPE zeiinv_item_data,
+       gs_itemlist        TYPE zein_s_item,
+       gs_ein_inv         TYPE ty_ein_inv,
+       gs_bdh             TYPE /1bea/s_crmb_bdh_wrk ,
+       gs_crmb_bdh_all   LIKE LINE OF gt_crmb_bdh_all .
+
+*&--- Global Variables
+DATA : gv_salesoffice    TYPE char04,
+       gv_sf_name        TYPE tdsfname,
+       gv_org_bill       TYPE bea_headno_ext,
+       gv_org_bill2      TYPE bea_headno_ext,
+       gv_response3      TYPE xstring,
+       gv_return3        TYPE crmt_boolean,
+       gv_sf_fm          TYPE rs38l_fnam,      "To get Smartform Name
+       gv_return         TYPE crmt_boolean,
+       gv_response       TYPE xstring,
+       gv_pwd            TYPE char05,
+       gv_response2      TYPE xstring,
+       gv_return2        TYPE crmt_boolean,
+       gv_len_in         TYPE i,               "For file size
+       gv_bin_file       TYPE xstring,
+       gv_filename_pdf   TYPE string,
+       gv_filename_pdf1  TYPE string,
+       gv_filename_csv   TYPE string,
+       gv_temppath       TYPE string,
+       gv_path           TYPE string,
+       gv_filepath       TYPE string,
+       gv_filepath1      TYPE string,
+       gv_filepath2      TYPE string,
+       gv_del1           TYPE  sxpgcolist-parameters,
+       gv_del2           TYPE  sxpgcolist-parameters,
+       gv_tabix          TYPE sy-tabix.
+
+DATA : it_inv           TYPE zein_str_inv OCCURS 0 WITH HEADER LINE,
+       itemlist         TYPE zein_str_itemlist OCCURS 0 WITH HEADER LINE.
+
+DATA : gt_tt_inv TYPE zein_tt_str_inv,
+       gs_inv    TYPE zein_str_inv.
+
+DATA: gr_grid   TYPE REF TO cl_gui_alv_grid.
+
+FIELD-SYMBOLS : <fs_final> TYPE ty_final.
+
+TYPES: BEGIN OF ty_return,
+         slno         TYPE zcount,
+         vbeln        TYPE vbeln_vf,
+         key(5),
+         type(1),
+         message(100),
+       END OF ty_return.
+
+DATA: BEGIN OF it_alv OCCURS 0.
+        INCLUDE STRUCTURE it_inv.
+        INCLUDE STRUCTURE itemlist.
+DATA: check         TYPE c,
+      ackno         TYPE zzeiackno,
+      ackdt         TYPE zzeiackdt,
+      acktm         TYPE zzeiacktm,
+      icon          TYPE char4,
+      posnr         TYPE crmt_item_no ,           "posnr_vf,
+      bukrs         TYPE bukrs,
+      werks         TYPE werks_d,
+      fkart         TYPE fkart,
+      fkdat         TYPE fkdat,
+      prdnm         TYPE matnr,
+      fkimg         TYPE fkimg,
+      ttype(10),
+      dmessage(100), "Invoice Data Validity Message
+      dvalid(1), "Invoice Data Valid or not
+      status(20),
+      validfrom(30),
+      tmode(10),
+      validto(30),
+      tdocdate      TYPE sy-datum,
+      field_style   TYPE lvc_t_styl,
+      message(200),
+      irn           TYPE string.
+DATA: END OF it_alv.
+
+DATA :     wa_itemlist      TYPE zein_str_itemlist,
+     wa_attribdtls    TYPE zein_str_attribdtls ,
+      wa_req           TYPE zein_req,
+     wa_ein_bill_req   TYPE zein_bil_req ,
+     wa_log           TYPE zein_log,
+     wa_zein_inv      TYPE zein_inv,
+     wa_zein_inv_item TYPE zein_inv_item,
+     wa_zein_rep      TYPE zein_response,
+     wa_return        TYPE ty_return.
+
+
+DATA: token              TYPE ztbx_string,
+     token_message TYPE char100,
+lv_response        TYPE string ,                    "ztbx_string,
+requestid          TYPE zzreqid,
+res_len(10)        TYPE n,
+lv_fgstin          TYPE zzfgstin,
+lv_vbeln           TYPE  bea_headno_ext,
+lv_json_char       TYPE  string , "       ztbx_string,
+json_out           TYPE string,
+gv_count(3)        TYPE n,
+http_code          TYPE char10,
+http_reason        TYPE char100,
+lv_slen            TYPE i,
+gv_ysday           TYPE datum.
+DATA: BEGIN OF result,
+        ackdt         TYPE string,
+        ackno         TYPE string,
+        irn           TYPE string,
+        signedinvoice TYPE string,
+        signedqrcode  TYPE string,
+        status        TYPE string,
+      END OF result.
+
+DATA: BEGIN OF it_result,
+      success TYPE string,
+      result  LIKE result,
+      message TYPE string,
+    END OF it_result.
+
+DATA: BEGIN OF it_gen_result,
+        msg TYPE string,
+        response  LIKE result,
+        path TYPE string,
+        status TYPE string,
+        taxillaerrorcode  TYPE string,
+*        result  LIKE result,
+        errors  TYPE zein_str_errors1,
+        entities TYPE zein_str_entities,
+      END OF it_gen_result.
+
+DATA: BEGIN OF it_gen_result_2,
+        msg TYPE string,
+        response  LIKE result,
+        path TYPE string,
+        status TYPE string,
+        taxillaerrorcode  TYPE string,
+*        result  LIKE result,
+        errors  TYPE zein_str_js_err,
+        entities TYPE zein_str_entities,
+      END OF it_gen_result_2.
+
+DATA: BEGIN OF it_gen_result_3,
+        timestamp TYPE string ,
+        path TYPE string,
+        status TYPE string,
+        taxillaerrorcode  TYPE string,
+        msg TYPE string,
+        response  LIKE result,
+        errors  TYPE zein_str_js_err,
+        entities TYPE zein_str_entities,
+      END OF it_gen_result_3.
+
+
+* DATA: BEGIN OF it_gen_result_any,
+*        msg TYPE string,
+*        response  LIKE result,
+*        path TYPE string,
+*        status TYPE string,
+*        taxillaerrorcode  TYPE string,
+**        result  LIKE result,
+*        errors  TYPE zein_str_errors1,
+*        entities TYPE zein_str_entities,
+*      END OF it_gen_result_any.
+
+*data it_gen_result_any type any .
+
+
+DATA: BEGIN OF it_error,
+        error             TYPE string,
+        error_description TYPE string,
+      END OF it_error.
+
+DATA : gt_zein_inv_1    TYPE TABLE OF zein_inv .
+
+DATA :gt_docperddtls TYPE zein_tt_docperddtls ,
+     gs_docperddtls LIKE LINE OF gt_docperddtls ,
+     gt_precdocdtls TYPE zein_tt_precdocdtls ,
+     gs_precdocdtls  LIKE LINE OF gt_precdocdtls .
+
+DATA : gv_irn TYPE string ,
+         gv_json_lines TYPE i .
+
+DATA : gt_db_crmb_bdh TYPE TABLE OF /1bea/crmb_bdh ,
+       gs_db_crmb_bdh LIKE LINE OF gt_db_crmb_bdh ,
+       gt_db_inv_resp TYPE TABLE OF zein_response ,
+       gs_db_inv_resp LIKE LINE OF  gt_db_inv_resp  ,
+
+       gt_zein_inv TYPE TABLE OF zein_inv ,
+       gs_zein_inv LIKE LINE OF gt_zein_inv .
+
+
+*DATA : gt_asp_eroor TYPE zein_tt_fields ,
+*       gs_asp_error TYPE LINE OF zein_tt_fields.
+DATA : gv_error TYPE LINE OF zein_tt_fields.
+DATA : lt_records TYPE TABLE OF zein_str_records,
+       lv_rec_error TYPE zein_tt_fields,
+      ls_rec_error TYPE string,
+      ls_records TYPE zein_str_records.
+DATA : lt_entities TYPE TABLE OF zein_str_entities.
+DATA : ls_entities TYPE zein_str_entities.
+DATA : lt_errors TYPE TABLE OF zein_tt_fields.
+DATA : ls_errors TYPE zein_tt_fields.
+
+
+DATA : gv_message TYPE zein_log-message.
+
+FIELD-SYMBOLS <ft_jsondt> TYPE ANY  .
+DATA : lv_org_odn TYPE itl_official_docno .
+
+DATA : ls_supp_gst TYPE zein_str_sellerdtls ,
+  lv_headno_ext_h TYPE bea_headno_ext .
+
+DATA : gt_accp_req TYPE STANDARD TABLE OF zein_bil_req ,
+       gs_accp_req LIKE LINE OF gt_accp_req .
+
+DATA : gt_err_fileds TYPE STANDARD TABLE OF zein_s_error_fileds ,
+       gs_err_fileds LIKE LINE OF gt_err_fileds .
+
+DATA : gt_err_msg TYPE zein_tt_fields ,
+       gs_err_msg LIKE LINE OF gt_err_msg .
+
+DATA :  gt_inv_data_b TYPE STANDARD TABLE OF zein_inv_data ,
+        gs_inv_data_b LIKE LINE OF  gt_inv_data_b ,
+
+        gt_inv_data_n TYPE STANDARD TABLE OF zein_inv_data ,
+        gs_inv_data_n LIKE LINE OF  gt_inv_data_n .
+
+DATA : lv_partner TYPE bapibus1006_head-bpartner ,
+       lv_part_gstin  TYPE bapibus1006tax-taxnumber .
+
